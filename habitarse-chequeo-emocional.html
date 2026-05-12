@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chequeo emocional — Habitarse</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --verde: #1D9E75;
+    --verde-claro: #E6F5EF;
+    --verde-dark: #0F6E56;
+    --verde-mid: #5DCAA5;
+    --text: #1A1A1A;
+    --text-sec: #5C5C5C;
+    --text-ter: #9A9A9A;
+    --bg: #FAFAF8;
+    --bg2: #F2F2EE;
+    --border: #E4E4DF;
+    --white: #FFFFFF;
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 16px; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 0 60px;
+  }
+
+  /* ── Header ── */
+  .site-header {
+    width: 100%;
+    text-align: center;
+    padding: 32px 20px 0;
+    margin-bottom: 32px;
+  }
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+  }
+  .brand-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--verde);
+  }
+  .brand-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    color: var(--text);
+    letter-spacing: -0.3px;
+  }
+
+  /* ── Card ── */
+  .card {
+    width: 100%;
+    max-width: 520px;
+    background: var(--white);
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    padding: 36px 36px 32px;
+    box-shadow: 0 2px 24px rgba(0,0,0,0.05);
+    margin: 0 16px;
+  }
+
+  /* ── Progress ── */
+  .progress-wrap { margin-bottom: 28px; }
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .progress-meta span {
+    font-size: 12px;
+    color: var(--text-ter);
+    font-weight: 300;
+    letter-spacing: 0.04em;
+  }
+  .progress-bar {
+    height: 2px;
+    background: var(--border);
+    border-radius: 2px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--verde);
+    border-radius: 2px;
+    transition: width 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* ── Step header ── */
+  .step-header { margin-bottom: 24px; }
+  .step-header h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 24px;
+    color: var(--text);
+    line-height: 1.25;
+    margin-bottom: 8px;
+    letter-spacing: -0.3px;
+  }
+  .step-header p {
+    font-size: 14px;
+    color: var(--text-sec);
+    line-height: 1.65;
+    font-weight: 300;
+  }
+
+  /* ── Intensidad ── */
+  .int-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 28px;
+  }
+  .int-btn {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 18px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--white);
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.18s ease;
+  }
+  .int-btn:hover { background: var(--bg); border-color: var(--verde-mid); }
+  .int-btn.selected {
+    background: var(--verde-claro);
+    border-color: var(--verde);
+  }
+  .int-emoji { font-size: 22px; width: 32px; text-align: center; }
+  .int-info { flex: 1; }
+  .int-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+  .int-btn.selected .int-label { color: var(--verde-dark); }
+  .int-desc {
+    font-size: 12px;
+    color: var(--text-ter);
+    font-weight: 300;
+  }
+  .int-btn.selected .int-desc { color: var(--verde-dark); opacity: 0.7; }
+  .int-radio {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.18s;
+  }
+  .int-btn.selected .int-radio {
+    border-color: var(--verde);
+    background: var(--verde);
+  }
+  .int-radio-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: white;
+    opacity: 0;
+    transform: scale(0);
+    transition: all 0.18s;
+  }
+  .int-btn.selected .int-radio-dot { opacity: 1; transform: scale(1); }
+
+  /* ── Emociones ── */
+  .emo-section { margin-bottom: 28px; }
+  .emo-cat { margin-bottom: 18px; }
+  .cat-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-ter);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+  .chip {
+    padding: 7px 14px;
+    border-radius: 30px;
+    border: 1px solid var(--border);
+    background: var(--white);
+    font-size: 13px;
+    color: var(--text-sec);
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s ease;
+    font-weight: 300;
+  }
+  .chip:hover { border-color: var(--verde-mid); color: var(--text); }
+  .chip.sel-alegria  { background: #EEF7E5; border-color: #6BA82A; color: #3A6010; font-weight: 400; }
+  .chip.sel-tristeza { background: #E8F0FB; border-color: #2A68B5; color: #1A4A85; font-weight: 400; }
+  .chip.sel-enojo    { background: #FBEAEA; border-color: #B53030; color: #852020; font-weight: 400; }
+  .chip.sel-miedo    { background: #FBF0E3; border-color: #9A5A10; color: #6A3C08; font-weight: 400; }
+  .chip.sel-sorpresa { background: #EFEDFC; border-color: #5E58C8; color: #3E3898; font-weight: 400; }
+  .chip.sel-calma    { background: var(--verde-claro); border-color: var(--verde); color: var(--verde-dark); font-weight: 400; }
+  .chip.sel-otros    { background: var(--bg2); border-color: #AAAAAA; color: var(--text); font-weight: 400; }
+
+  /* ── Cuerpo ── */
+  .body-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 28px;
+  }
+  .body-btn {
+    padding: 12px 8px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--white);
+    cursor: pointer;
+    text-align: center;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    color: var(--text-sec);
+    line-height: 1.4;
+    font-weight: 300;
+    transition: all 0.15s ease;
+  }
+  .body-btn:hover { background: var(--bg); border-color: var(--verde-mid); }
+  .body-btn.selected { background: var(--verde-claro); border-color: var(--verde); color: var(--verde-dark); font-weight: 400; }
+  .body-icon { font-size: 20px; display: block; margin-bottom: 5px; }
+
+  /* ── Sliders ── */
+  .sliders-section { margin-bottom: 22px; }
+  .slider-row { margin-bottom: 18px; }
+  .slider-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+  }
+  .slider-question {
+    font-size: 13px;
+    color: var(--text-sec);
+    font-weight: 300;
+    line-height: 1.4;
+  }
+  .slider-val {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--verde);
+    min-width: 32px;
+    text-align: right;
+  }
+  input[type=range] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--border);
+    outline: none;
+    cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--verde);
+    cursor: pointer;
+    box-shadow: 0 0 0 3px rgba(29,158,117,0.15);
+    transition: box-shadow 0.18s;
+  }
+  input[type=range]::-webkit-slider-thumb:hover {
+    box-shadow: 0 0 0 5px rgba(29,158,117,0.2);
+  }
+  .slider-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--text-ter);
+    margin-top: 5px;
+    font-weight: 300;
+  }
+
+  /* ── Textarea ── */
+  .nota-wrap { margin-bottom: 28px; }
+  .nota-label {
+    font-size: 13px;
+    color: var(--text-sec);
+    margin-bottom: 8px;
+    font-weight: 300;
+  }
+  .nota-label em { font-style: normal; color: var(--text-ter); }
+  textarea {
+    width: 100%;
+    padding: 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 1.65;
+    resize: vertical;
+    min-height: 100px;
+    transition: border-color 0.18s;
+  }
+  textarea::placeholder { color: var(--text-ter); }
+  textarea:focus { outline: none; border-color: var(--verde); background: var(--white); }
+
+  /* ── Navegación ── */
+  .nav {
+    display: flex;
+    gap: 10px;
+    margin-top: 4px;
+  }
+  .btn-next {
+    flex: 1;
+    padding: 14px;
+    border-radius: var(--radius-sm);
+    border: none;
+    background: var(--verde);
+    color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 400;
+    cursor: pointer;
+    transition: all 0.18s;
+    letter-spacing: 0.01em;
+  }
+  .btn-next:hover { background: var(--verde-dark); }
+  .btn-next:disabled { opacity: 0.35; cursor: default; }
+  .btn-back {
+    padding: 14px 20px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-sec);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.18s;
+    font-weight: 300;
+  }
+  .btn-back:hover { background: var(--bg2); }
+
+  /* ── Resultado ── */
+  .result-block { margin-bottom: 14px; }
+  .result-block-label {
+    font-size: 11px;
+    color: var(--text-ter);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 7px;
+    font-weight: 500;
+  }
+  .result-block-body {
+    background: var(--bg);
+    border-radius: var(--radius-sm);
+    padding: 13px 16px;
+    border: 1px solid var(--border);
+  }
+  .result-block-body p {
+    font-size: 14px;
+    color: var(--text);
+    font-weight: 300;
+    line-height: 1.6;
+  }
+  .rtags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .rtag {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    color: var(--text-sec);
+    font-weight: 300;
+  }
+  .divider { height: 1px; background: var(--border); margin: 22px 0; }
+
+  /* ── Mensaje de Yuliana ── */
+  .mensaje-yuli {
+    border-radius: var(--radius);
+    padding: 22px 22px 18px;
+    margin-bottom: 16px;
+    background: var(--verde-claro);
+    border-left: 3px solid var(--verde);
+  }
+  .mensaje-yuli p {
+    font-size: 14px;
+    color: var(--verde-dark);
+    line-height: 1.8;
+    font-weight: 300;
+  }
+  .mensaje-yuli .firma {
+    font-size: 12px;
+    color: var(--verde);
+    margin-top: 12px;
+    font-style: italic;
+    display: block;
+  }
+
+  /* ── Tarea ── */
+  .tarea-card {
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--white);
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .tarea-header {
+    background: var(--bg2);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .tarea-badge {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--verde);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+  }
+  .tarea-icon-wrap {
+    font-size: 18px;
+  }
+  .tarea-body { padding: 18px 20px; }
+  .tarea-titulo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    color: var(--text);
+    margin-bottom: 8px;
+    letter-spacing: -0.2px;
+  }
+  .tarea-desc {
+    font-size: 13px;
+    color: var(--text-sec);
+    line-height: 1.65;
+    margin-bottom: 16px;
+    font-weight: 300;
+  }
+  .tarea-steps { display: flex; flex-direction: column; gap: 10px; }
+  .tarea-step {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .step-num {
+    min-width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--verde);
+    color: white;
+    font-size: 11px;
+    font-weight: 500;
+    display: flex; align-items: center; justify-content: center;
+    margin-top: 1px;
+    flex-shrink: 0;
+  }
+  .step-text {
+    font-size: 13px;
+    color: var(--text-sec);
+    line-height: 1.6;
+    font-weight: 300;
+    padding-top: 2px;
+  }
+
+  /* ── Footer note ── */
+  .footer-note {
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-ter);
+    font-weight: 300;
+    margin-top: 8px;
+    line-height: 1.6;
+  }
+  .footer-note a { color: var(--verde); text-decoration: none; }
+
+  @media (max-width: 560px) {
+    .card { padding: 28px 20px 24px; margin: 0 12px; }
+    .body-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a class="brand" href="#">
+    <div class="brand-dot"></div>
+    <span class="brand-name">Habitarse</span>
+  </a>
+</header>
+
+<div class="card" id="card">
+  <div id="app"></div>
+</div>
+
+<script>
+const S = {
+  step: 0,
+  intensidad: null,
+  emociones: [],
+  cuerpo: [],
+  nota: '',
+  bienestar: 5,
+  apoyo: 5,
+};
+
+const ints = [
+  { e:'😶', v:1, label:'Neutra', desc:'No siento emociones muy marcadas ahora mismo.' },
+  { e:'🌱', v:2, label:'Suave', desc:'Hay algo, pero no me pesa demasiado.' },
+  { e:'💛', v:3, label:'Moderada', desc:'Lo noto con claridad y ocupa algo de espacio.' },
+  { e:'🔥', v:4, label:'Intensa', desc:'Es fuerte y difícil de ignorar.' },
+  { e:'🌊', v:5, label:'Abrumadora', desc:'Me desborda o me cuesta manejarlo.' },
+];
+
+const eData = [
+  { cat:'alegria',  label:'Alegría / bienestar',      items:['Feliz','Agradecida','Esperanzada','Entusiasmada','Tranquila','Satisfecha','En paz'] },
+  { cat:'tristeza', label:'Tristeza / melancolía',     items:['Triste','Vacía','Nostálgica','Desilusionada','Sola','Cansada','Desconectada'] },
+  { cat:'enojo',    label:'Enojo / frustración',       items:['Enojada','Frustrada','Irritada','Resentida','Impotente','Decepcionada'] },
+  { cat:'miedo',    label:'Miedo / ansiedad',          items:['Ansiosa','Asustada','Preocupada','Nerviosa','Insegura','Abrumada'] },
+  { cat:'sorpresa', label:'Confusión / sorpresa',      items:['Confundida','Sorprendida','Perdida','Desconcertada'] },
+  { cat:'calma',    label:'Calma / claridad',          items:['Centrada','Serena','Conectada','Presente','Clara'] },
+  { cat:'otros',    label:'Otros estados',             items:['Entumecida','Avergonzada','Culpable','Orgullosa','Curiosa','Ambivalente'] },
+];
+
+const cuerpo = [
+  { i:'💓', l:'Pecho apretado' },
+  { i:'🫁', l:'Respiración corta' },
+  { i:'🤢', l:'Malestar en el estómago' },
+  { i:'😤', l:'Tensión en mandíbula' },
+  { i:'🦵', l:'Piernas pesadas' },
+  { i:'🤯', l:'Cabeza llena' },
+  { i:'😴', l:'Agotamiento físico' },
+  { i:'✨', l:'Ligera / relajada' },
+  { i:'🫶', l:'Sin molestias físicas' },
+];
+
+function getMensaje() {
+  const em = S.emociones;
+  const v = S.intensidad || 1;
+  const tiene = arr => arr.some(e => em.includes(e));
+
+  if (tiene(['Ansiosa','Preocupada','Abrumada','Nerviosa','Asustada'])) {
+    return v >= 4
+      ? 'Lo que estás sintiendo es real, y que puedas nombrarlo ya es un paso enorme. No tienes que cargarlo sola. Lo que estamos construyendo juntas tiene un propósito: que tengas herramientas para estos momentos. Valida lo que sientes hoy, no lo dejes para después.'
+      : 'Noto que algo te está generando inquietud. Eso que sientes merece atención, no espera. Nuestro trabajo juntas existe precisamente para estos momentos. Trae esto a nuestra próxima sesión, es parte importante de lo que estamos construyendo.';
+  }
+  if (tiene(['Triste','Vacía','Sola','Desilusionada','Desconectada'])) {
+    return 'La tristeza también tiene derecho a estar ahí. No la empujes, escúchala un momento. Lo que registras hoy es parte de nuestro proceso juntas, y quiero que sepas que lo que sientes importa. No lo dejes guardado, tráelo a nuestra sesión.';
+  }
+  if (tiene(['Enojada','Frustrada','Impotente','Resentida','Irritada'])) {
+    return 'El enojo casi siempre está protegiendo algo valioso. Nombrarlo, como lo estás haciendo ahora, ya es un acto de autoconocimiento. No lo invalides. Lo que estamos construyendo juntas incluye aprender a escuchar estas señales, no a silenciarlas.';
+  }
+  if (tiene(['Feliz','Agradecida','Tranquila','Satisfecha','En paz','Centrada','Serena'])) {
+    return '¡Qué bueno registrar este momento! Notar el bienestar también es parte del proceso, tu mente necesita evidencia de que los buenos momentos existen. Esto que sientes hoy es parte de lo que estamos construyendo juntas. Quédate un instante con ello.';
+  }
+  return 'Gracias por detenerte a escucharte. Cada vez que haces este registro estás invirtiendo en ti misma y en lo que construimos juntas. No dejes que lo que sientes se quede sin validar, merece tu atención hoy.';
+}
+
+function getTarea() {
+  const em = S.emociones;
+  const tiene = arr => arr.some(e => em.includes(e));
+
+  if (tiene(['Ansiosa','Preocupada','Abrumada','Nerviosa'])) {
+    return {
+      icon: '🫁',
+      titulo: 'Respiración 4-7-8',
+      desc: 'Cuando la ansiedad aparece, el cuerpo necesita una señal de seguridad. Esta técnica activa el sistema nervioso parasimpático en menos de dos minutos.',
+      pasos: [
+        'Siéntate cómoda, con la espalda apoyada. Cierra los ojos si puedes.',
+        'Inhala suavemente por la nariz contando hasta 4.',
+        'Retén el aire contando hasta 7, sin forzar.',
+        'Exhala lentamente por la boca contando hasta 8.',
+        'Repite el ciclo completo 3 veces. Ponle pausa a todo lo demás.',
+      ],
+    };
+  }
+  if (tiene(['Triste','Vacía','Sola','Desconectada','Cansada'])) {
+    return {
+      icon: '✍️',
+      titulo: 'Carta de tres líneas',
+      desc: 'Escribir le da forma a lo que sentimos. No necesita ser bonito ni largo, solo honesto.',
+      pasos: [
+        'Busca papel o tu cuaderno. Escribe la fecha de hoy.',
+        'Completa esta frase: "Hoy me siento así porque..."',
+        'Escribe una cosa pequeña que necesitas de ti misma esta semana.',
+        'No tienes que releerlo. Solo escríbelo y suéltalo.',
+      ],
+    };
+  }
+  if (tiene(['Enojada','Frustrada','Impotente','Irritada'])) {
+    return {
+      icon: '🦵',
+      titulo: 'Movimiento de descarga',
+      desc: 'El enojo es energía atrapada en el cuerpo. Necesita moverse, no solo pensarse.',
+      pasos: [
+        'Párate, cierra los ojos 10 segundos y siente dónde está la tensión.',
+        'Sacude los brazos y manos con fuerza durante 30 segundos.',
+        'Camina o muévete en tu espacio durante 2 minutos, sin objetivo.',
+        'Termina con tres respiraciones lentas y profundas.',
+      ],
+    };
+  }
+  if (tiene(['Asustada','Insegura','Perdida','Confundida'])) {
+    return {
+      icon: '🌱',
+      titulo: 'Grounding 5-4-3-2-1',
+      desc: 'Cuando te sientes perdida o asustada, anclar los sentidos al presente interrumpe la espiral mental.',
+      pasos: [
+        'Nombra (en voz alta o mentalmente) 5 cosas que puedes ver ahora mismo.',
+        '4 cosas que puedes tocar. Tócalas de verdad.',
+        '3 sonidos que escuchas en este momento.',
+        '2 olores o sensaciones en tu piel. 1 cosa que notes en tu boca.',
+      ],
+    };
+  }
+  if (tiene(['Feliz','Agradecida','Tranquila','En paz','Satisfecha'])) {
+    return {
+      icon: '💛',
+      titulo: 'Registro de gratitud anclada',
+      desc: 'Los momentos de bienestar se van rápido si no los registramos. Hoy tienes uno, quédate con él.',
+      pasos: [
+        'Escribe una cosa concreta que está saliendo bien en tu vida ahora.',
+        'Escribe a quién o qué quieres agradecer hoy (puede ser a ti misma).',
+        'Cierra los ojos 1 minuto y siente eso en el cuerpo: ¿dónde lo notas?',
+      ],
+    };
+  }
+  return {
+    icon: '🧘',
+    titulo: 'Pausa de un minuto',
+    desc: 'No importa cómo llegaste hoy, este minuto es solo tuyo.',
+    pasos: [
+      'Pon un temporizador de 60 segundos.',
+      'Cierra los ojos o baja la mirada suavemente.',
+      'No hagas nada, no pienses en nada. Solo observa lo que aparece.',
+      'Cuando suene, escribe una palabra que resuma lo que notaste.',
+    ],
+  };
+}
+
+function render() {
+  const app = document.getElementById('app');
+  const totalPasos = 4;
+  const pct = Math.round((S.step / totalPasos) * 100);
+  let h = '';
+
+  if (S.step < totalPasos) {
+    h += `
+      <div class="progress-wrap">
+        <div class="progress-meta">
+          <span>Paso ${S.step + 1} de ${totalPasos}</span>
+          <span>${pct}%</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width:${pct}%"></div>
+        </div>
+      </div>`;
+  }
+
+  /* ── Paso 0: Intensidad ── */
+  if (S.step === 0) {
+    h += `
+      <div class="step-header">
+        <h2>¿Cómo estás hoy?</h2>
+        <p>Un espacio para detenerte, escucharte y ponerle palabras a lo que estás sintiendo en este momento.</p>
+      </div>
+      <div class="int-grid">`;
+    ints.forEach(i => {
+      const sel = S.intensidad === i.v;
+      h += `
+        <button class="int-btn${sel ? ' selected' : ''}" onclick="pick(${i.v})">
+          <span class="int-emoji">${i.e}</span>
+          <span class="int-info">
+            <span class="int-label">${i.label}</span>
+            <span class="int-desc">${i.desc}</span>
+          </span>
+          <span class="int-radio"><span class="int-radio-dot"></span></span>
+        </button>`;
+    });
+    h += `</div>
+      <div class="nav">
+        <button class="btn-next" onclick="next()" ${!S.intensidad ? 'disabled' : ''}>Continuar</button>
+      </div>`;
+  }
+
+  /* ── Paso 1: Emociones ── */
+  else if (S.step === 1) {
+    h += `
+      <div class="step-header">
+        <h2>¿Qué emociones reconoces?</h2>
+        <p>Elige todas las que resuenen contigo hoy. No hay respuestas correctas ni equivocadas.</p>
+      </div>
+      <div class="emo-section">`;
+    eData.forEach(cat => {
+      h += `<div class="emo-cat"><div class="cat-label">${cat.label}</div><div class="chips">`;
+      cat.items.forEach(item => {
+        const sel = S.emociones.includes(item);
+        h += `<button class="chip${sel ? ' sel-' + cat.cat : ''}" onclick="toggleEm('${item.replace(/'/g, "\\'")}')">${item}</button>`;
+      });
+      h += `</div></div>`;
+    });
+    h += `</div>
+      <div class="nav">
+        <button class="btn-back" onclick="prev()">Atrás</button>
+        <button class="btn-next" onclick="next()" ${S.emociones.length === 0 ? 'disabled' : ''}>Continuar</button>
+      </div>`;
+  }
+
+  /* ── Paso 2: Cuerpo ── */
+  else if (S.step === 2) {
+    h += `
+      <div class="step-header">
+        <h2>¿Qué siente tu cuerpo?</h2>
+        <p>Las emociones siempre dejan una huella física. ¿Qué notas ahora mismo?</p>
+      </div>
+      <div class="body-grid">`;
+    cuerpo.forEach((item, idx) => {
+      h += `
+        <button class="body-btn${S.cuerpo.includes(idx) ? ' selected' : ''}" onclick="toggleC(${idx})">
+          <span class="body-icon">${item.i}</span>${item.l}
+        </button>`;
+    });
+    h += `</div>
+      <div class="nav">
+        <button class="btn-back" onclick="prev()">Atrás</button>
+        <button class="btn-next" onclick="next()">Continuar</button>
+      </div>`;
+  }
+
+  /* ── Paso 3: Escalas + nota ── */
+  else if (S.step === 3) {
+    h += `
+      <div class="step-header">
+        <h2>Un poco más sobre hoy</h2>
+        <p>Esta información es nuestra. Ayuda a que nuestro trabajo juntas sea más preciso y cercano.</p>
+      </div>
+      <div class="sliders-section">
+        <div class="slider-row">
+          <div class="slider-top">
+            <span class="slider-question">¿Cómo te sientes en general hoy?</span>
+            <span class="slider-val" id="val-bienestar">${S.bienestar}/10</span>
+          </div>
+          <input type="range" min="1" max="10" value="${S.bienestar}" step="1"
+            oninput="setSl('bienestar', this.value)">
+          <div class="slider-labels"><span>Muy mal</span><span>Muy bien</span></div>
+        </div>
+        <div class="slider-row">
+          <div class="slider-top">
+            <span class="slider-question">¿Cuánto apoyo sientes que tienes?</span>
+            <span class="slider-val" id="val-apoyo">${S.apoyo}/10</span>
+          </div>
+          <input type="range" min="1" max="10" value="${S.apoyo}" step="1"
+            oninput="setSl('apoyo', this.value)">
+          <div class="slider-labels"><span>Muy poco</span><span>Mucho</span></div>
+        </div>
+      </div>
+      <div class="nota-wrap">
+        <p class="nota-label">¿Quieres contarme algo más? <em>(opcional)</em></p>
+        <textarea
+          placeholder="Lo que quieras compartir: una situación, un pensamiento, algo que se repite..."
+          oninput="S.nota=this.value">${S.nota}</textarea>
+      </div>
+      <div class="nav">
+        <button class="btn-back" onclick="prev()">Atrás</button>
+        <button class="btn-next" onclick="next()">Ver mi resumen</button>
+      </div>`;
+  }
+
+  /* ── Paso 4: Resumen ── */
+  else if (S.step === 4) {
+    const intObj = ints.find(i => i.v === S.intensidad);
+    const tarea = getTarea();
+    h += `
+      <div class="step-header">
+        <h2>Tu chequeo de hoy</h2>
+        <p>Gracias por tomarte este momento para escucharte.</p>
+      </div>`;
+
+    h += `
+      <div class="result-block">
+        <div class="result-block-label">Intensidad emocional</div>
+        <div class="result-block-body">
+          <p>${intObj ? intObj.e + ' ' + intObj.label + ' — ' + intObj.desc : '—'}</p>
+        </div>
+      </div>`;
+
+    if (S.emociones.length > 0) {
+      h += `
+        <div class="result-block">
+          <div class="result-block-label">Emociones identificadas</div>
+          <div class="result-block-body">
+            <div class="rtags">`;
+      S.emociones.forEach(e => { h += `<span class="rtag">${e}</span>`; });
+      h += `</div></div></div>`;
+    }
+
+    if (S.cuerpo.length > 0) {
+      h += `
+        <div class="result-block">
+          <div class="result-block-label">Sensaciones corporales</div>
+          <div class="result-block-body">
+            <div class="rtags">`;
+      S.cuerpo.forEach(idx => { h += `<span class="rtag">${cuerpo[idx].i} ${cuerpo[idx].l}</span>`; });
+      h += `</div></div></div>`;
+    }
+
+    h += `
+      <div class="result-block">
+        <div class="result-block-label">Bienestar general · Apoyo percibido</div>
+        <div class="result-block-body">
+          <p>${S.bienestar}/10 · ${S.apoyo}/10</p>
+        </div>
+      </div>`;
+
+    if (S.nota) {
+      h += `
+        <div class="result-block">
+          <div class="result-block-label">Tu nota</div>
+          <div class="result-block-body"><p>${S.nota}</p></div>
+        </div>`;
+    }
+
+    h += `<div class="divider"></div>`;
+
+    h += `
+      <div class="mensaje-yuli">
+        <p>${getMensaje()}</p>
+        <span class="firma">— Yuliana, Habitarse</span>
+      </div>`;
+
+    h += `
+      <div class="tarea-card">
+        <div class="tarea-header">
+          <span class="tarea-icon-wrap">${tarea.icon}</span>
+          <span class="tarea-badge">Tarea para hoy</span>
+        </div>
+        <div class="tarea-body">
+          <div class="tarea-titulo">${tarea.titulo}</div>
+          <p class="tarea-desc">${tarea.desc}</p>
+          <div class="tarea-steps">`;
+    tarea.pasos.forEach((p, i) => {
+      h += `
+        <div class="tarea-step">
+          <div class="step-num">${i + 1}</div>
+          <span class="step-text">${p}</span>
+        </div>`;
+    });
+    h += `</div></div></div>`;
+
+    h += `
+      <div class="nav">
+        <button class="btn-back" onclick="prev()">Editar respuestas</button>
+      </div>
+      <p class="footer-note" style="margin-top:20px;">
+        Si lo que sientes es urgente, escríbeme directamente.<br>Estoy aquí.
+      </p>`;
+  }
+
+  app.innerHTML = h;
+}
+
+function pick(v) { S.intensidad = v; render(); }
+function toggleEm(e) {
+  const i = S.emociones.indexOf(e);
+  i >= 0 ? S.emociones.splice(i, 1) : S.emociones.push(e);
+  render();
+}
+function toggleC(idx) {
+  const i = S.cuerpo.indexOf(idx);
+  i >= 0 ? S.cuerpo.splice(i, 1) : S.cuerpo.push(idx);
+  render();
+}
+function setSl(k, v) {
+  S[k] = parseInt(v);
+  const el = document.getElementById('val-' + k);
+  if (el) el.textContent = v + '/10';
+}
+function next() { S.step = Math.min(S.step + 1, 4); render(); }
+function prev() { S.step = Math.max(S.step - 1, 0); render(); }
+
+render();
+</script>
+</body>
+</html>
